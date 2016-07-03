@@ -1,6 +1,7 @@
 #ifndef PLATFORM_SOCKET_LINUX_CPP
 #define PLATFORM_SOCKET_LINUX_CPP
 
+#include "socket_linux.hpp"
 #include "../common_types.hpp"
 #include "../address.hpp"
 
@@ -11,29 +12,27 @@
 #include <iostream>
 #include <unistd.h>
 
-namespace Platform
-{
+bool32 Platform::gSocketInitialized = 0;
 
-static bool32 gSocketInitialized = 0;
-
-bool32 InitializeSockets()
+bool32 Platform::InitializeSockets()
 {
     gSocketInitialized = true;
     return true;
 }
 
-void ShutdownSockets()
+void Platform::ShutdownSockets()
 {
 }
 
-int32 StartSocket(uint16 port)
+int32 Platform::StartSocket(uint16 port)
 {
     int32 handle = socket(AF_INET,
                           SOCK_DGRAM,
                           IPPROTO_UDP);
     if (handle <= 0)
     {
-        std::cout << "Failed to create socket" << std::endl;
+        std::cout << "Failed to create socket" 
+                  << std::endl;
         return 0;
     }
 
@@ -42,24 +41,37 @@ int32 StartSocket(uint16 port)
     address.sin_addr.s_addr = INADDR_ANY;
     address.sin_port = htons((uint16)port);
 
+    int nonBlocking = 1;
+    if (fcntl(handle, F_SETFL,
+                      O_NONBLOCK,
+                      nonBlocking) == -1)
+    {
+        std::cout << "Failed to set non-blocking" 
+                  << std::endl;
+        close(handle);
+        return 0;
+    }
+
     if (bind(handle, (const sockaddr*)&address, sizeof(sockaddr_in)) < 0)
     {
-        std::cout << "Failed to bind socket\n" << std::endl;
+        std::cout << "Failed to bind socket" 
+                  << std::endl;
+        close(handle);
         return 0;
     }
 
     return handle;
 }
 
-void CloseSocket(int32 handle)
+void Platform::CloseSocket(int32 handle)
 {
     close(handle);
 }
 
-bool32 Send(int handle, 
-            const Address& dest,
-            const void *data,
-            int32 size)
+bool32 Platform::Send(int handle, 
+                      const Address& dest,
+                      const void *data,
+                      int32 size)
 {
     // TODO(Cristian): Should this be in the address class?
     sockaddr_in addr;
@@ -87,10 +99,10 @@ bool32 Send(int handle,
     return true;
 }
 
-int32 Receive(int32 handle, 
-              Address& sender,
-              void *buffer, 
-              int32 bufferSize)
+int32 Platform::Receive(int32 handle, 
+                        Address& sender,
+                        void *buffer, 
+                        int32 bufferSize)
 {
     sockaddr_in from;
     socklen_t fromLength = sizeof(from);
@@ -110,8 +122,6 @@ int32 Receive(int32 handle,
 
     printf("Received from %d:%d", fromAddress, fromPort);
     return bytes;
-}
-
 }
 
 #endif

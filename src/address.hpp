@@ -12,15 +12,15 @@ public:
 
 public:
     uint32 GetAddress() const;
-    uint8 GetA() const { return (uint8)(_address >> 24); }
-    uint8 GetB() const { return (uint8)((_address >> 16) & 0xFF); }
-    uint8 GetC() const { return (uint8)((_address >>  8) & 0xFF); }
-    uint8 GetD() const { return (uint8)(_address & 0xFF); }
-    uint16 GetPort() const { return _port; }
+    uint8 GetA() const;
+    uint8 GetB() const;
+    uint8 GetC() const;
+    uint8 GetD() const;
+    uint16 GetPort() const;
 
 private:
     uint32 _address;
     uint16 _port;
-}
+};
 
 #endif

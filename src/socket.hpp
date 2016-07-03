@@ -4,6 +4,11 @@
 #include "common_types.hpp"
 #include "address.hpp"
 
+#include "platform/identify.hpp"
+#if PLATFORM == PLATFORM_UNIX
+#include "platform/socket_linux.hpp"
+#endif
+
 class Socket
 {
 public:

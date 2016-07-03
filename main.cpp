@@ -1,44 +1,34 @@
 // platform detection
 
+#include "src/socket.hpp"
 
-#include <stdio.h>
+#include <string>
+#include <iostream>
 
-#include <string.h>
 #include <unistd.h>
-
 
 #define PORT 30000
 
-bool SetSocketAsNonBlocking(int handle)
-{
-    int nonBlocking = 1;
-    if (fcntl(handle, F_SETFL,
-                      O_NONBLOCK,
-                      nonBlocking) == -1)
-    {
-        printf("failed to set non-blocking\n");
-        return false;
-    }
-
-    return true;
-}
-
 int main(int, char **)
 {
-    InitializeSockets();
+    Platform::InitializeSockets();
 
-    int socketHandle;
-    if(!StartSocket(socketHandle))
+    Socket socket;
+    if (!socket.Open(PORT))
     {
-        return 1;
-    }
-    if (!SetSocketAsNonBlocking(socketHandle))
-    {
+        std::cout << "COULD NOT OPEN SOCKET ON PORT: "
+                  << PORT << std::endl;
         return 1;
     }
 
     int maxPacketSize = 256;
     char packetData[maxPacketSize];
+
+    Address targetAddress(127, 0, 0, 1, PORT);
+
+    std::string data("DATA");
+
+    Address senderAddress;
 
     int programCounter = 0;
     int counter = 4;
@@ -57,22 +47,23 @@ int main(int, char **)
         {
             counter = 0;
 
-            sockaddr_in targetAddress = CreateSocketAddress(127, 0, 0, 1, 30000);
-            if (!SendPacket(socketHandle, targetAddress))
+            if (!socket.Send(targetAddress, data.c_str(), data.length()))
             {
                 return 1;
             }
         }
 
-        bool result = ReceivePacket(socketHandle, packetData, maxPacketSize);
-        if (result)
+        int32 readBytes = socket.Receive(senderAddress, packetData, maxPacketSize);
+
+        if (readBytes > 0)
         {
-            printf("RECEIVED: %s\n", packetData);
+            std::cout << "RECEIVED " << readBytes 
+                      << " BYTES: " << packetData
+                      << std::endl;
         }
+
         sleep(1);
     }
 
-    close(socketHandle);
-    ShutdownSockets();
-
+    return 0;
 }

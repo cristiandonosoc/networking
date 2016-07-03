@@ -1,15 +1,19 @@
 CXX=g++
-OBJ=main.cpp src/address.cpp src/socket.cpp src/platform/socket_linux.cpp
+DEPS=src/address.cpp src/socket.cpp src/platform/socket_linux.cpp src/utils.cpp
 OBJ_DIR=obj
 
-BIN=socket
 BIN_DIR=bin
 
 FLAGS=-g --std=c++11
 
+all: server client
 
-all: $(BIN_DIR)
-	$(CXX) $(FLAGS) $(OBJ) -o $(BIN_DIR)/$(BIN)
+server: $(BIN_DIR)
+	$(CXX) $(FLAGS) src/server.cpp $(DEPS) -o $(BIN_DIR)/server
+
+client: $(BIN_DIR)
+	$(CXX) $(FLAGS) src/client.cpp $(DEPS) -o $(BIN_DIR)/client
+
 
 $(BIN_DIR):
 	mkdir -p $(BIN_DIR)

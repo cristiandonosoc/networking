@@ -2,6 +2,7 @@
 #define ADDRESS_CPP
 
 #include "address.hpp"
+#include <sstream>
 
 // Constructors 
 
@@ -51,6 +52,24 @@ uint8 Address::GetD() const
 uint16 Address::GetPort() const
 {
     return _port;
+}
+
+void Address::SetPort(uint16 port)
+{
+    _port = port;
+}
+
+
+#include <iostream>
+std::string Address::ToString() const
+{
+    std::ostringstream output;
+    output << (uint32)GetA() << "."
+           << (uint32)GetB() << "."
+           << (uint32)GetC() << "."
+           << (uint32)GetD() << ":"
+           << GetPort();
+    return output.str();
 }
 
 #endif

@@ -2,6 +2,7 @@
 #define ADDRESS_HPP
 
 #include "common_types.hpp"
+#include <string>
 
 class Address
 {
@@ -17,6 +18,10 @@ public:
     uint8 GetC() const;
     uint8 GetD() const;
     uint16 GetPort() const;
+    void SetPort(uint16 port);
+    std::string ToString() const;
+
+private:
 
 private:
     uint32 _address;

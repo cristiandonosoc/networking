@@ -120,7 +120,6 @@ int32 Platform::Receive(int32 handle,
     uint16 fromPort = ntohl(from.sin_addr.s_addr);
     sender = Address(fromAddress, fromPort);
 
-    printf("Received from %d:%d", fromAddress, fromPort);
     return bytes;
 }
 

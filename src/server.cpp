@@ -28,8 +28,10 @@ int main(int, char **)
         int32 readBytes = socket.Receive(senderAddress, packetData, maxPacketSize);
         if (readBytes > 0)
         {
+            packetData[readBytes] = '\0';
             std::cout << "RECEIVED " << readBytes 
                       << " BYTES: " << packetData
+                      << " FROM: " << senderAddress.ToString()
                       << std::endl;
         }
 
